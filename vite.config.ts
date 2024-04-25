@@ -76,12 +76,34 @@ function viteStripCommentsPlugin(): Plugin {
   };
 }
 
+function removeGitKeepPlugin(): Plugin {
+  return {
+    name: "remove-gitkeep",
+    apply: "build",
+    closeBundle() {
+      const directory = path.resolve(__dirname, "dist");
+      function removeGitKeep(directory: string) {
+        fs.readdirSync(directory, { withFileTypes: true }).forEach((entry) => {
+          const fullPath = path.join(directory, entry.name);
+          if (entry.isDirectory()) {
+            removeGitKeep(fullPath);
+          } else if (entry.isFile() && entry.name === ".gitkeep") {
+            fs.unlinkSync(fullPath);
+          }
+        });
+      }
+      removeGitKeep(directory);
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     viteSingleFile(),
     createHtmlPlugin({ minify: true }),
     viteBase64ImagePlugin(),
     viteStripCommentsPlugin(),
+    removeGitKeepPlugin(),
   ],
   build: {
     minify: "terser",
