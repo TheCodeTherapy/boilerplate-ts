@@ -69,8 +69,8 @@ function viteStripCommentsPlugin(): Plugin {
     name: "vite-strip-comments",
     enforce: "post",
     renderChunk(code) {
-      const licenseCommentRegex = /\/\*\*[\s\S]*?@license[\s\S]*?\*\/\n/g;
-      const newCode = code.replace(licenseCommentRegex, "");
+      const multilineCommentRegex = /\/\*[\s\S]*?\*\//g;
+      const newCode = code.replace(multilineCommentRegex, "");
       return { code: newCode, map: null };
     },
   };
