@@ -2,16 +2,19 @@ import "./style.css";
 import typescriptLogo from "./assets/typescript.svg";
 import { setupCounter } from "./counter.ts";
 
-document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${typescriptLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-  </div>
-`;
+function app() {
+  const appElement = document.getElementById("app");
+  const counterButton = document.createElement("button");
 
-setupCounter(document.querySelector<HTMLButtonElement>("#counter")!);
+  const appImage = document.createElement("img");
+  appImage.src = typescriptLogo;
+  appImage.className = "logo";
+
+  counterButton.id = "counter";
+  setupCounter(counterButton);
+
+  appElement?.appendChild(appImage);
+  appElement?.appendChild(counterButton);
+}
+
+app();

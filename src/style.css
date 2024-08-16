@@ -13,6 +13,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.logo {
+  display: block;
+  margin: 20px;
+  width: 100px;
+  height: 100px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
