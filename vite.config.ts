@@ -19,7 +19,7 @@ function viteBase64ImagePlugin(): Plugin {
         !id.startsWith("/") ||
         id.includes("\x00")
       ) {
-        return null; // Skip handling non-filesystem or virtual paths
+        return null;
       }
 
       const extension = path.extname(id);
