@@ -1,0 +1,4 @@
+node_modules
+dist
+dtsPlugin.ts
+project_info.js
