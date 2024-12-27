@@ -1,24 +1,17 @@
-import { defineConfig } from "vite";
-import { viteSingleFile } from "vite-plugin-singlefile";
-import { createHtmlPlugin } from "vite-plugin-html";
-import { Plugin } from "vite";
-import { optimize } from "svgo";
 import fs from "fs";
-import path from "path";
 import mime from "mime-types";
-
-const execDir = process.cwd();
+import path from "path";
+import { optimize } from "svgo";
+import { defineConfig, Plugin } from "vite";
+import { createHtmlPlugin } from "vite-plugin-html";
+import { viteSingleFile } from "vite-plugin-singlefile";
 
 function viteBase64ImagePlugin(): Plugin {
   return {
     name: "vite-base64-image-plugin",
     enforce: "pre",
     load(id: string) {
-      if (
-        id.startsWith("vite:") ||
-        !id.startsWith("/") ||
-        id.includes("\x00")
-      ) {
+      if (id.startsWith("vite:") || !id.startsWith("/") || id.includes("\x00")) {
         return null;
       }
 
@@ -33,34 +26,28 @@ function viteBase64ImagePlugin(): Plugin {
             plugins: [
               {
                 name: "preset-default",
-                params: { overrides: { removeViewBox: false } },
+                params: { overrides: { removeViewBox: false } }
               },
               "removeComments",
-              "cleanupIds",
+              "cleanupIds"
             ],
-            multipass: true,
+            multipass: true
           });
           optimized = optimizedContent.data;
         } catch (error) {
-          console.log(
-            `Couldn't optimize ${id} SVG file. Using unoptimized version.`
-          );
+          console.log(`Couldn't optimize ${id} SVG file. Using unoptimized version.`);
         }
         const svg = optimized !== null ? optimized : svgContent;
-        const encodedSvgContent = encodeURIComponent(svg)
-          .replace(/'/g, "%27")
-          .replace(/"/g, "%22");
+        const encodedSvgContent = encodeURIComponent(svg).replace(/'/g, "%27").replace(/"/g, "%22");
         return `export default "data:image/svg+xml;charset=utf-8,${encodedSvgContent}"`;
       } else {
         if ([".png", ".jpg", ".jpeg", ".gif"].includes(extension)) {
           const fileBuffer = fs.readFileSync(id);
-          const base64String = `data:${mimeType};base64,${fileBuffer.toString(
-            "base64"
-          )}`;
+          const base64String = `data:${mimeType};base64,${fileBuffer.toString("base64")}`;
           return `export default "${base64String}"`;
         }
       }
-    },
+    }
   };
 }
 
@@ -72,7 +59,7 @@ function viteStripCommentsPlugin(): Plugin {
       const multilineCommentRegex = /\/\*[\s\S]*?\*\//g;
       const newCode = code.replace(multilineCommentRegex, "");
       return { code: newCode, map: null };
-    },
+    }
   };
 }
 
@@ -82,9 +69,9 @@ function removeGitKeepPlugin(): Plugin {
     apply: "build",
     closeBundle() {
       const directory = path.resolve(__dirname, "dist");
-      function removeGitKeep(directory: string) {
-        fs.readdirSync(directory, { withFileTypes: true }).forEach((entry) => {
-          const fullPath = path.join(directory, entry.name);
+      function removeGitKeep(dir: string) {
+        fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
+          const fullPath = path.join(dir, entry.name);
           if (entry.isDirectory()) {
             removeGitKeep(fullPath);
           } else if (entry.isFile() && entry.name === ".gitkeep") {
@@ -93,7 +80,7 @@ function removeGitKeepPlugin(): Plugin {
         });
       }
       removeGitKeep(directory);
-    },
+    }
   };
 }
 
@@ -103,7 +90,7 @@ export default defineConfig({
     createHtmlPlugin({ minify: true }),
     viteBase64ImagePlugin(),
     viteStripCommentsPlugin(),
-    removeGitKeepPlugin(),
+    removeGitKeepPlugin()
   ],
   build: {
     minify: "terser",
@@ -115,12 +102,12 @@ export default defineConfig({
         keep_fnames: false,
         module: true,
         toplevel: true,
-        safari10: false,
+        safari10: false
       },
       compress: {
         drop_console: true,
-        drop_debugger: true,
-      },
-    },
-  },
+        drop_debugger: true
+      }
+    }
+  }
 });
